@@ -12,7 +12,7 @@ module.exports = class ChannelTyping extends Plugin {
     const TypingIndicator = Flux.connectStores(
       [ typingStore ],
       ({ id }) => ({ typingCount: Object.keys(typingStore.getTypingUsers(id)).filter(id => id !== currentUser.getCurrentUser().id).length })
-    )(this._renderTypingElement);
+    )(this._renderTypingElement0.bind(this));
 
     inject('channeltyping-channel', TextChannel.prototype, 'render', function (args, res) {
       if (!this.props.selected && !this.props.muted) {
@@ -24,6 +24,10 @@ module.exports = class ChannelTyping extends Plugin {
 
   pluginWillUnload () {
     uninject('channeltyping-channel');
+  }
+
+  _renderTypingElement0 (props) {
+    return this._renderTypingElement(props);
   }
 
   _renderTypingElement ({ typingCount }) {
