@@ -14,9 +14,10 @@ module.exports = class ChannelTyping extends Plugin {
       ({ id }) => ({ typingCount: Object.keys(typingStore.getTypingUsers(id)).filter(id => id !== currentUser.getCurrentUser().id).length })
     )(this._renderTypingElement0.bind(this));
 
-    inject('channeltyping-channel', TextChannel.prototype, 'render', function (args, res) {
-      if (!this.props.selected && !this.props.muted) {
-        res.props.children[1].props.children[2].props.children.push(React.createElement(TypingIndicator, { id: this.props.channel.id }));
+    inject('channeltyping-channel', TextChannel.prototype, 'renderIcons', function (args, res) {
+      // Other plugins cause this to rerender, leading to duplicated elements.
+      if ((!this.props.selected && !this.props.muted) || res.props.children.find(c => c && c.type === TypingIndicator)) {
+        res.props.children.push(React.createElement(TypingIndicator, { id: this.props.channel.id }));
       }
       return res;
     });
@@ -26,6 +27,7 @@ module.exports = class ChannelTyping extends Plugin {
     uninject('channeltyping-channel');
   }
 
+  // thats made so plugins can inject custom logic in _renderTypingElement. used by betterfriends.
   _renderTypingElement0 (props) {
     return this._renderTypingElement(props);
   }
