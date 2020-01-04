@@ -87,13 +87,22 @@ module.exports = class ChannelTyping extends Plugin {
                 })
                 : this.Messages.SEVERAL_USERS_TYPING)
         },
-        React.createElement(Spinner, {
-          type: 'pulsingEllipsis',
-          style: {
-            marginLeft: 5,
-            opacity: 0.7
-          }
-        })
+        React.createElement('div',
+          {
+            style: {
+              height: 16,
+              display: 'flex',
+              alignItems: 'center'
+            }
+          },
+          React.createElement(Spinner, {
+            type: 'pulsingEllipsis',
+            style: {
+              marginLeft: 5,
+              opacity: 0.7
+            }
+          })
+        )
       );
   }
 };
