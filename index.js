@@ -6,7 +6,7 @@
 const { Plugin } = require('powercord/entities');
 const { Tooltip, Spinner } = require('powercord/components');
 const { inject, uninject } = require('powercord/injector');
-const { React, Flux, getModule, getModuleByDisplayName } = require('powercord/webpack');
+const { React, Flux, getModule, getModuleByDisplayName, i18n: { Messages } } = require('powercord/webpack');
 
 const fluxConnector = Flux.connectStoresAsync(
   [
@@ -32,7 +32,6 @@ const fluxConnector = Flux.connectStoresAsync(
 
 module.exports = class ChannelTyping extends Plugin {
   async startPlugin () {
-    this.Messages = (await getModule([ 'Messages' ])).Messages;
     const TextChannel = await getModuleByDisplayName('ChannelItem');
     const PrivateChannel = await getModuleByDisplayName('PrivateChannel');
 
@@ -41,8 +40,8 @@ module.exports = class ChannelTyping extends Plugin {
 
     inject('channeltyping-channel', TextChannel.prototype, 'renderIcons', function (_, res) {
       // Other plugins cause this to rerender, leading to duplicated elements.
-      if (!this.props.selected && !this.props.muted && !res.props.children.find(c => c && c.type === TypingIndicator)) {
-        res.props.children.push(React.createElement(TypingIndicator, { channel: this.props.channel }));
+      if (!this.props.selected && !this.props.muted && !res.props.children.props.children.find(c => c && c.type === TypingIndicator)) {
+        res.props.children.props.children.push(React.createElement(TypingIndicator, { channel: this.props.channel }));
       }
       return res;
     });
@@ -96,18 +95,18 @@ module.exports = class ChannelTyping extends Plugin {
 
   _formatTyping (typing) {
     return typing.length === 1
-      ? this.Messages.ONE_USER_TYPING.format({ a: typing[0] })
+      ? Messages.ONE_USER_TYPING.format({ a: typing[0] })
       : typing.length === 2
-        ? this.Messages.TWO_USERS_TYPING.format({
+        ? Messages.TWO_USERS_TYPING.format({
           a: typing[0],
           b: typing[1]
         })
         : typing.length === 3
-          ? this.Messages.THREE_USERS_TYPING.format({
+          ? Messages.THREE_USERS_TYPING.format({
             a: typing[0],
             b: typing[1],
             c: typing[2]
           })
-          : this.Messages.SEVERAL_USERS_TYPING;
+          : Messages.SEVERAL_USERS_TYPING;
   }
 };
