@@ -40,7 +40,7 @@ module.exports = class ChannelTyping extends Plugin {
 
     inject('channeltyping-channel', TextChannel.prototype, 'renderIcons', function (_, res) {
       // Other plugins cause this to rerender, leading to duplicated elements.
-      if (!this.props.selected && !this.props.muted && !res.props.children.props.children.find(c => c && c.type === TypingIndicator)) {
+      if (!this.props.selected && !this.props.muted && res.props.children.props && !res.props.children.props.children.find(c => c && c.type === TypingIndicator)) {
         res.props.children.props.children.push(React.createElement(TypingIndicator, { channel: this.props.channel }));
       }
       return res;
