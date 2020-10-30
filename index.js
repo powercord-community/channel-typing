@@ -7,6 +7,7 @@ const { Plugin } = require('powercord/entities');
 const { Tooltip, Spinner } = require('powercord/components');
 const { inject, uninject } = require('powercord/injector');
 const { React, Flux, getModule, getModuleByDisplayName, i18n: { Messages } } = require('powercord/webpack');
+const { findInReactTree } = require('powercord/util');
 
 const fluxConnector = Flux.connectStoresAsync(
   [
@@ -32,17 +33,23 @@ const fluxConnector = Flux.connectStoresAsync(
 
 module.exports = class ChannelTyping extends Plugin {
   async startPlugin () {
-    const TextChannel = await getModuleByDisplayName('ChannelItem');
+    const TextChannel = await getModule(m => m.default?.displayName === 'ChannelItem');
     const PrivateChannel = await getModuleByDisplayName('PrivateChannel');
 
     const TypingIndicator = fluxConnector((props) => this._renderTypingElement(props));
     const TypingOrChildren = fluxConnector((props) => this._renderGroupTyping(props));
 
-    inject('channeltyping-channel', TextChannel.prototype, 'renderIcons', function (_, res) {
+    inject('channeltyping-channel', TextChannel, 'default', (args, res) => {
       // Other plugins cause this to rerender, leading to duplicated elements.
-      if (!this.props.selected && !this.props.muted && !res.props.children.find(c => c && c.type === TypingIndicator)) {
-        res.props.children.push(React.createElement(TypingIndicator, { channel: this.props.channel }));
+      if (args[0].selected || args[0].muted) {
+        return res;
       }
+
+      const icons = findInReactTree(res, n => n.className?.startsWith('children-'));
+      if (!icons.children.find(c => c && c.type === TypingIndicator)) {
+        icons.children.push(React.createElement(TypingIndicator, { channel: args[0].channel }));
+      }
+
       return res;
     });
 
@@ -53,6 +60,8 @@ module.exports = class ChannelTyping extends Plugin {
       }
       return res;
     });
+
+    TextChannel.default.displayName = 'ChannelItem';
   }
 
   pluginWillUnload () {
