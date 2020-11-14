@@ -93,6 +93,7 @@ module.exports = class ChannelTyping extends Plugin {
           },
           React.createElement(Spinner, {
             type: 'pulsingEllipsis',
+            animated: document.hasFocus(),
             style: {
               marginLeft: 5,
               opacity: 0.7
