@@ -81,7 +81,8 @@ module.exports = class ChannelTyping extends Plugin {
       : React.createElement(Tooltip,
         {
           position: 'top',
-          text: this._formatTyping(typing)
+          text: this._formatTyping(typing),
+          className: 'channel-typing'
         },
         React.createElement('div',
           {
