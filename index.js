@@ -12,7 +12,7 @@ const { findInReactTree } = require('powercord/util');
 const fluxConnector = Flux.connectStoresAsync(
   [
     getModule([ 'getTypingUsers' ]),
-    getModule([ 'getCurrentUser' ]),
+    getModule([ 'getCurrentUser', 'getUser' ]),
     getModule([ 'getMember' ]),
     getModule([ 'isBlocked', 'isFriend' ])
   ],
